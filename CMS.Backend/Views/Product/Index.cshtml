@@ -1,0 +1,54 @@
+﻿@model IEnumerable<CMS.Data.Entities.Product>
+
+@{
+    ViewData["Title"] = "Danh sách sản phẩm";
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4 text-danger">
+        DANH SÁCH SÁCH KINH DỊ & TRINH THÁM
+    </h2>
+
+    <div class="row">
+
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+
+                <div class="card shadow-sm h-100">
+
+                    <img src="@item.ImageUrl"
+                         class="card-img-top"
+                         style="height:250px; object-fit:cover;"
+                         alt="Ảnh sách">
+
+                    <div class="card-body">
+
+                        <h5 class="card-title text-primary">
+                            @item.Name
+                        </h5>
+
+                        <p class="card-text text-truncate">
+                            @item.Description
+                        </p>
+
+                        <p>
+                            <strong>Giá:</strong>
+                            @item.Price VNĐ
+                        </p>
+
+                        <p>
+                            <strong>Số lượng:</strong>
+                            @item.StockQuantity
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+</div>

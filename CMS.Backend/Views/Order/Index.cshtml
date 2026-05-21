@@ -1,0 +1,47 @@
+﻿@model IEnumerable<CMS.Data.Entities.Order>
+
+@{
+    ViewData["Title"] = "Danh sách đơn hàng";
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4 text-success">
+        DANH SÁCH ĐƠN HÀNG
+    </h2>
+
+    <table class="table table-bordered table-hover">
+
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Ngày đặt</th>
+                <th>Khách hàng</th>
+                <th>Trạng thái</th>
+                <th>Ghi chú</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+
+                    <td>
+                        @item.OrderDate.ToString("dd/MM/yyyy")
+                    </td>
+
+                    <td>@item.CustomerId</td>
+
+                    <td>@item.Status</td>
+
+                    <td>@item.Notes</td>
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+</div>

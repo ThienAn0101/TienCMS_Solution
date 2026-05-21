@@ -1,7 +1,7 @@
 ﻿/*
  * Ten: Le Thi Cam Tien
  * MSV: 2123110041
- * Ngay tao: 2026-05-14
+ * Ngay tao: 2026-05-21
  * Version: 1.0
  */
 
@@ -11,21 +11,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CMS.Backend.Controllers
 {
-    public class CategoryController : Controller
+    public class CustomerController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        // "Tiêm" kết nối vào Controller
-        public CategoryController(ApplicationDbContext context)
+        public CustomerController(ApplicationDbContext context)
         {
             _context = context;
         }
 
         public IActionResult Index()
         {
-            // Lấy dữ liệu THẬT từ bảng Categories trong SQL
-            var data = _context.Categories.ToList();
-            return View(data);
+            var customers = _context.Customers.ToList();
+
+            return View(customers);
         }
     }
 }

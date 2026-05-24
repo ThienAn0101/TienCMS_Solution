@@ -1,4 +1,6 @@
-﻿
+﻿@{
+    Layout = "_LayoutAdmin";
+}
 @{
     ViewData["Title"] = "Details";
 }
@@ -27,8 +29,8 @@
                 <img src="@Model.ImageUrl" class="img-fluid rounded shadow" alt="Post Image" style="width: 100%;">
             </div>
 
-            <div class="post-content fs-5 leading-lg">
-                @Model.Content
+            <div class="post-content fs-5 mt-3">
+                @Html.Raw(Model.Content)
             </div>
 
             <div class="mt-5 border-top pt-3">

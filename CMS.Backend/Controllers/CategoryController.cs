@@ -95,5 +95,23 @@ namespace CMS.Backend.Controllers
             // Quay lại trang danh sách để xem kết quả
             return RedirectToAction("Index");
         }
+
+        // 2. Định nghĩa đường dẫn có tham số: api/posts/category/{id}
+        [HttpGet("category/{categoryId}")]
+        public IActionResult GetByCategory(int categoryId)
+        {
+            // Lọc các bài viết có CategoryId trùng với ID truyền vào từ URL
+            var posts = _context.Posts
+                .Where(p => p.CategoryId == categoryId)
+                .Select(p => new {
+                    p.Id,
+                    p.Title,
+                    p.ImageUrl,
+                    p.CreatedDate,
+                })
+                .ToList();
+
+            return Ok(posts);
+        }
     }
 }

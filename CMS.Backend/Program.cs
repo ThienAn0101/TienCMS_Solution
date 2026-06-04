@@ -1,4 +1,11 @@
-﻿using CMS.Data;
+﻿/*
+ * Ten: Le Thi Cam Tien
+ * MSV: 2123110041
+ * Ngay tao: 2026-05-28
+ * Version: 1.0
+ */
+
+using CMS.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;

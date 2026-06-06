@@ -1,14 +1,14 @@
-﻿@model CMS.Data.Entities.Post
+﻿@model CMS.Data.Entities.Product
 
 @{
     Layout = "_LayoutAdmin";
-    ViewData["Title"] = "Chỉnh sửa bài viết";
+    ViewData["Title"] = "Chỉnh sửa sản phẩm";
 }
 
 <div class="container mt-4">
     <div class="card shadow">
         <div class="card-header bg-primary text-white">
-            <h4 class="mb-0"><i class="bi bi-pencil-square"></i> CHỈNH SỬA BÀI VIẾT </h4>
+            <h4 class="mb-0"><i class="bi bi-pencil-square"></i> CHỈNH SỬA SẢN PHẨM </h4>
         </div>
         <div class="card-body">
             <form asp-action="Edit" method="post" enctype="multipart/form-data">
@@ -19,29 +19,35 @@
                 <div class="row">
                     <div class="col-md-8">
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Tiêu đề bài viết:</label>
-                            <input asp-for="Title" class="form-control" placeholder="Nhập tiêu đề..." />
-                            <span asp-validation-for="Title" class="text-danger"></span>
+                            <label class="form-label fw-bold">Tên sản phẩm:</label>
+                            <input asp-for="Name" class="form-control" placeholder="Nhập tên sản phẩm..." />
+                            <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Nội dung chi tiết:</label>
-                            <textarea asp-for="Content" class="form-control" rows="10" placeholder="Viết nội dung tại đây..."></textarea>
-                            <span asp-validation-for="Content" class="text-danger"></span>
+                            <label class="form-label fw-bold">Giá bán (VNĐ):</label>
+                            <input asp-for="Price" type="number" class="form-control" placeholder="Ví dụ: 150000" />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mô tả sản phẩm:</label>
+                            <textarea asp-for="Description" class="form-control" rows="10" placeholder="Nhập mô tả sản phẩm tại đây..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
                     </div>
 
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Chuyên mục:</label>
-                            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryList">
-                                <option value="">-- Chọn danh mục --</option>
+                            <label class="form-label fw-bold">Danh mục sản phẩm:</label>
+                            <select asp-for="CategoryProductId" class="form-select" asp-items="ViewBag.CategoryProductList">
+                                <option value="">-- Chọn danh mục sản phẩm --</option>
                             </select>
-                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                            <span asp-validation-for="CategoryProductId" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Ảnh bài viết hiện tại:</label>
+                            <label class="form-label fw-bold">Ảnh sản phẩm hiện tại:</label>
                             <div class="mb-2">
                                 @if (!string.IsNullOrEmpty(Model?.ImageUrl))
                                 {
@@ -55,14 +61,6 @@
                             <label class="form-label fw-bold text-success">Thay đổi ảnh mới (Nếu có):</label>
                             <input type="file" name="uploadImage" class="form-control" accept="image/*" />
                             <span asp-validation-for="ImageUrl" class="text-danger"></span>
-                        </div>
-
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Ngày đăng:</label>
-                            <input asp-for="CreatedDate" type="date" class="form-control"
-                                   value="@(Model?.CreatedDate != null ? Model.CreatedDate.ToString("yyyy-MM-dd") : DateTime.Now.ToString("yyyy-MM-dd"))" />
-                            <span asp-validation-for="CreatedDate" class="text-danger"></span>
                         </div>
 
                         <hr />
@@ -89,7 +87,7 @@
 
     <script>
         ClassicEditor
-        .create(document.querySelector('#Content'))
+        .create(document.querySelector('#Description')) // Đổi từ #Content sang #Description cho khớp Id sản phẩm
         .then(editor => {
         editor.ui.view.editable.element.style.height = '300px';
         })

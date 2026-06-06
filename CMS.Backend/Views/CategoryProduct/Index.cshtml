@@ -1,6 +1,9 @@
 ﻿@{
     Layout = "_LayoutAdmin";
 }
+@{
+    ViewData["Title"] = "Index";
+}
 
 @model IEnumerable<CMS.Data.Entities.CategoryProduct>
 
@@ -9,8 +12,11 @@
     <h2 class="mb-4 text-primary">
         DANH SÁCH DANH MỤC SẢN PHẨM
     </h2>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Thêm danh mục bài viết
+    </a>
 
-    <table class="table table-bordered table-hover">
+    <table class="table table-bordered">
 
         <thead class="table-dark">
             <tr>
@@ -27,6 +33,14 @@
                     <td>@item.Id</td>
                     <td>@item.Name</td>
                     <td>@item.Description</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id"
+                           class="btn btn-sm btn-outline-warning">Sửa</a>
+
+                        <a asp-action="Delete" asp-route-id="@item.Id"
+                           class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này?')">Xóa</a>
+                    </td>
                 </tr>
             }
         </tbody>

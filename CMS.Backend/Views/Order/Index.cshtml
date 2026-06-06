@@ -1,50 +1,79 @@
-﻿@{
-    Layout = "_LayoutAdmin";
+﻿
+@{
+   Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Quản lý đơn hàng";
 }
 @model IEnumerable<CMS.Data.Entities.Order>
 
-@{
-    ViewData["Title"] = "Danh sách đơn hàng";
-}
-
 <div class="container mt-4">
 
-    <h2 class="mb-4 text-success">
-        DANH SÁCH ĐƠN HÀNG
-    </h2>
+     <h2 class="text-success fw-bold text-uppercase mb-4">DANH SÁCH ĐƠN HÀNG</h2>
 
-    <table class="table table-bordered table-hover">
-
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Ngày đặt</th>
-                <th>Khách hàng</th>
-                <th>Trạng thái</th>
-                <th>Ghi chú</th>
-            </tr>
-        </thead>
-
-        <tbody>
-
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Id</td>
-
-                    <td>
-                        @item.OrderDate.ToString("dd/MM/yyyy")
-                    </td>
-
-                    <td>@item.CustomerId</td>
-
-                    <td>@item.Status</td>
-
-                    <td>@item.Notes</td>
-                </tr>
-            }
-
-        </tbody>
-
-    </table>
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover mb-0 align-middle">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th style="width: 80px;">ID</th>
+                        <th>Ngày đặt</th>
+                        <th>Mã khách hàng</th>
+                        <th>Trạng thái</th>
+                        <th>Ghi chú</th>
+                        <th style="width: 280px;">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="text-center fw-bold">@item.Id</td>
+                            <td class="text-center">@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="text-center">@item.CustomerId</td>
+                            <td class="text-center">
+                                @if (item.Status == 0)
+                                {
+                                    <span class="badge bg-warning text-dark">Chờ xử lý</span>
+                                }
+                                else if (item.Status == 1)
+                                {
+                                    <span class="badge bg-primary">Đang giao hàng</span>
+                                }
+                                else if (item.Status == 2)
+                                {
+                                    <span class="badge bg-success">Đã nhận hàng</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Đã hủy</span>
+                                }
+                            </td>
+                            <td>@item.Notes</td>
+                            <td>
+                                <div class="d-flex gap-1 justify-content-center">
+                                    <a href="/Order/Details/@item.Id" class="btn btn-sm btn-outline-primary px-3">
+                                        🔍 Chi tiết
+                                    </a>
+                                    <form action="/Order/UpdateStatus" method="post" class="m-0 d-inline">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        @if (item.Status == 0)
+                                        {
+                                            <button type="submit" name="status" value="1" class="btn btn-sm btn-outline-warning text-warning fw-semibold">
+                                                🚚 Giao hàng
+                                            </button>
+                                        }
+                                        @if (item.Status == 1)
+                                        {
+                                            <button type="submit" name="status" value="2" class="btn btn-sm btn-outline-success text-success fw-semibold">
+                                                ✅ Hoàn thành
+                                            </button>
+                                        }
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

@@ -14,11 +14,17 @@ const blogService = {
         return axiosClient.get(url);
     },
 
-    // Hàm gọi API lấy toàn bộ các bài viết (Mẹo phối đồ, tin tức thời trang)
+    // 1. Hàm gọi API lấy toàn bộ các bài viết (Mẹo phối đồ, tin tức thời trang)
     getAllPosts: () => {
         const url = '/Posts'; // Khớp với Route quản lý bài viết ở Backend
         return axiosClient.get(url);
-    }
+    },
+
+    // 2. Hàm lấy chi tiết 1 bài viết theo ID (Phục vụ trang xem chi tiết sau này)
+    getPostById: (id) => {
+        const url = `/Posts/${id}`;
+        return axiosClient.get(url);
+    },
 };
 
 export default blogService;

@@ -40,6 +40,15 @@ const ProductList = () => {
                 products.map((item) => (
                     <div className="col-md-6 mb-4" key={item.id}>
                         <div className="card h-100 shadow-sm border">
+                            <img
+                                src={`https://localhost:7127${item.imageUrl}`}
+                                alt={item.name}
+                                className="card-img-top"
+                                style={{
+                                    height: "250px",
+                                    objectFit: "cover"
+                                }}
+                            />
                             <div className="card-body">
                                 <h5 className="card-title font-weight-bold text-dark">{item.name}</h5>
                                 <p className="card-text text-danger font-weight-bold">

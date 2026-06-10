@@ -6,7 +6,9 @@
  */
 
 import React from 'react';
-import CategoryList from './components/CategoryProductList';
+import CategoryProductList from './components/CategoryProductList';
+import CategoryList from './components/CategoryList';
+import BlogCategoryList from './components/BlogCategoryList';
 import ProductList from './components/ProductList'; 
 import PostList from './components/PostList';
 import './App.css';
@@ -21,9 +23,18 @@ function App() {
             </header>
 
             <div className="row">
+                {/* CỘT TRÁI: CHỨA CÁC BỘ LỌC PHÂN LOẠI DỮ LIỆU */}
+                <div className="col-md-4">
+                    {/* Phân loại phục vụ thương mại điện tử (Đã làm ở buổi trước) */}
+                    <CategoryList />
+
+                    {/* BÀI TẬP TỰ LÀM: Phân loại phục vụ quản trị nội dung tin tức blog */}
+                    <BlogCategoryList />
+                </div>
+
                 {/* Cột bên trái: Danh mục sản phẩm */}
                 <div className="col-md-4">
-                    <CategoryList />
+                    <CategoryProductList />
                 </div>
 
                 {/* Cột bên phải: Danh sách sản phẩm thời trang tự làm */}

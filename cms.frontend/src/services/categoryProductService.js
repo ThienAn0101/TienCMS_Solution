@@ -14,7 +14,7 @@ const categoryProductService = {
      */
     getAllCategoryProducts: () => {
         // Đường dẫn định tuyến khớp chính xác với cấu trúc định tuyến [Route("api/[controller]")] của Backend
-        const url = '/categoriesproducts';
+        const url = '/CategoryProducts';
         return axiosClient.get(url);
     }
 };

@@ -13,6 +13,18 @@ using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ---- CẤU HÌNH CORS (THÊM VÀO TRƯỚC builder.Build()) ----
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000") // Cho phép ReactJS ở port 3000 gọi tới
+              .AllowAnyHeader()                     // Cho phép mọi loại Header (Content-Type, Authorization...)
+              .AllowAnyMethod()                     // Cho phép mọi phương thức HTTP (GET, POST, PUT, DELETE)
+              .AllowCredentials();                  // Hỗ trợ truyền Cookie/Session nếu cần sau này
+    });
+});
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -66,8 +78,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-// 2. Kích hoạt chính sách CORS đã khai báo ở trên
-app.UseCors("AllowAll");
+
+// Kích hoạt chính sách CORS đã khai báo ở trên
+app.UseCors("AllowReactApp");
 
 app.UseAuthentication();
 app.UseAuthorization();

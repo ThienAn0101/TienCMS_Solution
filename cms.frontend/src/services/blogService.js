@@ -25,6 +25,7 @@ const blogService = {
         const url = `/Posts/${id}`;
         return axiosClient.get(url);
     },
+
 };
 
 export default blogService;

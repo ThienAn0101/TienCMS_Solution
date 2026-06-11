@@ -7,6 +7,7 @@
 
 import axiosClient from '../api/axiosClient';
 
+
 const categoryProductService = {
     /**
      * Hàm lấy toàn bộ danh mục SẢN PHẨM từ Backend
@@ -14,9 +15,10 @@ const categoryProductService = {
      */
     getAllCategoryProducts: () => {
         // Đường dẫn định tuyến khớp chính xác với cấu trúc định tuyến [Route("api/[controller]")] của Backend
-        const url = '/CategoryProducts';
+        const url = '/categoriesproducts';
         return axiosClient.get(url);
     }
 };
+
 
 export default categoryProductService;

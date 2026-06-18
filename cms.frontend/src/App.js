@@ -16,6 +16,11 @@ import Footer from './components/Footer';
 import Home from './pages/home/index';
 import BlogListPage from './pages/blog/index';
 import BlogDetail from './pages/blog/BlogDetail';
+import Blog from './pages/blog-detail/index';
+import Cart from './pages/cart/index';
+import Checkout from './pages/checkout/index';
+import ProductDetail from './pages/product-detail/index';
+import Shop from './pages/shop/index';
 
 import './App.css';
 
@@ -38,24 +43,25 @@ function App() {
                         <Route path="/post/:id" element={<BlogDetail />} />
 
                         {/* Cấu hình Trang Cửa hàng - Địa chỉ "/shop" */}
-
+                        <Route path="/shop" element={<Shop />} />
 
                         {/* Cấu hình Trang Chi tiết sản phẩm - Sử dụng tham số động ":id" */}
+                        <Route path="/product/:id" element={<ProductDetail />} />
                         {/* Ví dụ khi vào link: /product/5 -> useParams() sẽ lấy được id = 5 */}
 
 
                         {/* Cấu hình Trang Danh sách tin tức - Địa chỉ "/blog" */}
-
+                        <Route path="/blog" element={<Blog />} />
 
                         {/* Cấu hình Trang Chi tiết bài viết - Địa chỉ "/blog/:id" */}
                         <Route path="/blog/:id" element={<BlogDetail />} />
 
 
                         {/* Cấu hình Trang Giỏ hàng cá nhân - Địa chỉ "/cart" */}
-
+                        <Route path="/cart" element={<Cart />} />
 
                         {/* Cấu hình Trang Điền thông tin thanh toán - Địa chỉ "/checkout" */}
-
+                        <Route path="/checkout" element={<Checkout />} />
 
                         {/* XỬ LÝ KỊCH BẢN TRANG LỖI 404 (Khi sinh viên gõ sai URL) */}
                         <Route path="*" element={

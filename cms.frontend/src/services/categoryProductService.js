@@ -4,21 +4,19 @@
  * Ngay tao: 2026-06-09
  * Version: 1.0
  */
-
 import axiosClient from '../api/axiosClient';
 
-
 const categoryProductService = {
-    /**
-     * Hàm lấy toàn bộ danh mục SẢN PHẨM từ Backend
-     * Endpoint này kết nối tới CategoryProductController trong ASP.NET Core
-     */
-    getAllCategoryProducts: () => {
-        // Đường dẫn định tuyến khớp chính xác với cấu trúc định tuyến [Route("api/[controller]")] của Backend
-        const url = '/categoriesproducts';
-        return axiosClient.get(url);
+    getAllCategoryProducts: async () => {
+        try {
+            // SỬA Ở ĐÂY: Viết hoa chữ C và chữ P cho khớp với tên Controller bên Backend
+            const url = 'CategoryProducts';
+            const response = await axiosClient.get(url);
+            return response.data || response;
+        } catch (error) {
+            console.error("Lỗi API getAllCategoryProducts:", error);
+            throw error;
+        }
     }
 };
-
-
 export default categoryProductService;

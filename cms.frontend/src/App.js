@@ -21,6 +21,9 @@ import Cart from './pages/cart/index';
 import Checkout from './pages/checkout/index';
 import ProductDetail from './pages/product-detail/index';
 import Shop from './pages/shop/index';
+import Register from './pages/register/index';
+import Login from './pages/login/index';
+import About from './pages/about/index'; 
 
 import './App.css';
 
@@ -45,11 +48,19 @@ function App() {
                         {/* Cấu hình Trang Cửa hàng - Địa chỉ "/shop" */}
                         <Route path="/shop" element={<Shop />} />
 
+                        {/* Cau hinh trang About */ }
+                        <Route path="/about" element={<About />} />
+
                         {/* Cấu hình Trang Chi tiết sản phẩm - Sử dụng tham số động ":id" */}
                         <Route path="/product/:id" element={<ProductDetail />} />
                         {/* Ví dụ khi vào link: /product/5 -> useParams() sẽ lấy được id = 5 */}
 
+                        {/* BỔ SUNG KHAI BÁO ROUTE ĐĂNG KÝ VÀO ĐÂY */}
+                        <Route path="/register" element={<Register />} />
 
+                        {/* BỔ SUNG KHAI BÁO ROUTE ĐĂNG NHAP VÀO ĐÂY */}
+                        <Route path="/login" element={<Login />} />
+                        
                         {/* Cấu hình Trang Danh sách tin tức - Địa chỉ "/blog" */}
                         <Route path="/blog" element={<Blog />} />
 

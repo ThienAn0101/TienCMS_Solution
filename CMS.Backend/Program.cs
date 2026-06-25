@@ -2,23 +2,21 @@
  * Ten: Le Thi Cam Tien
  * MSV: 2123110041
  * Ngay tao: 2026-05-28
- * Version: 1.0
+ * Version: 1.1 (Đã sửa lỗi xung đột CORS giúp kết nối ReactJS mượt mà)
  */
-
 using CMS.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
-// ---- CẤU HÌNH CORS (THÊM VÀO TRƯỚC builder.Build()) ----
+// 🌟 1. CẤU HÌNH CORS CHUẨN (CHỈ KHAI BÁO DUY NHẤT 1 LẦN NÀY)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000") // Cho phép ReactJS ở port 3000 gọi tới
+        policy.WithOrigins("http://localhost:7127") // Cho phép ReactJS ở port 7127 gọi tới
               .AllowAnyHeader()                     // Cho phép mọi loại Header (Content-Type, Authorization...)
               .AllowAnyMethod()                     // Cho phép mọi phương thức HTTP (GET, POST, PUT, DELETE)
               .AllowCredentials();                  // Hỗ trợ truyền Cookie/Session nếu cần sau này
@@ -31,28 +29,18 @@ builder.Services.AddControllersWithViews();
 // --- Cấu hình Swagger ---
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// ------------------------------------
 
 // Đăng ký DbContext vào hệ thống
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 1. Khai báo dịch vụ xác thực Cookie
+// Khai báo dịch vụ xác thực Cookie
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.LoginPath = "/Account/Login";
         options.AccessDeniedPath = "/Account/AccessDenied";
     });
-// 1. Khai báo chính sách CORS
-builder.Services.AddCors(options => {
-    options.AddPolicy("AllowAll", policy => {
-        // Cho phép mọi nguồn (Origin), mọi phương thức (GET, POST...), mọi tiêu đề (Header)
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
 
 var app = builder.Build();
 
@@ -63,23 +51,19 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-// --- 🟢 BỔ SUNG: Bật giao diện Swagger ---
-// Chúng ta để ngoài lệnh IF để có thể test Swagger cả khi chạy bình thường
+// --- Bật giao diện Swagger ---
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "TienCMS API v1");
-    // Dòng dưới này giúp khi bạn vào link gốc (localhost:7127) nó không tự nhảy vào Swagger 
-    // mà vẫn giữ trang chủ Admin của bạn.
 });
-// -----------------------------------------
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
-// Kích hoạt chính sách CORS đã khai báo ở trên
+// 🌟 2. KÍCH HOẠT CHÍNH SÁCH CORS (Bắt buộc phải nằm SAU app.UseRouting() và TRƯỚC app.UseAuthorization())
 app.UseCors("AllowReactApp");
 
 app.UseAuthentication();

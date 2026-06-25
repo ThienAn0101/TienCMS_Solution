@@ -2,32 +2,42 @@
  * Ten: Le Thi Cam Tien
  * MSV: 2123110041
  * Ngay tao: 2026-06-09
- * Version: 1.1 (Tối ưu hóa bẫy lỗi API & Responsive layout)
+ * Version: 1.2 (Sửa lỗi bóc tách dữ liệu mảng $values từ ASP.NET Core Web API)
  */
+
 import React, { useState, useEffect } from 'react';
-// Import dịch vụ gọi API danh mục sản phẩm đã thiết lập ở Buổi 7
 import categoryProductService from '../../services/categoryProductService';
 
 function CategoryMenu() {
-    // 1. Khai báo State để lưu mảng danh mục sản phẩm từ SQL Server đổ về
     const [categories, setCategories] = useState([]);
-
-    // 2. Khai báo State để theo dõi danh mục nào đang được người dùng bấm chọn (Mặc định là chọn tất cả - null)
     const [activeCategoryId, setActiveCategoryId] = useState(null);
-
-    // 3. Khai báo State quản lý trạng thái Loading dữ liệu mạng
     const [loading, setLoading] = useState(true);
 
-    // 4. Gọi API ngay khi file thành phần component Tầng 3 được nạp lên trang chủ
     useEffect(() => {
         const fetchMenuCategories = async () => {
             try {
                 setLoading(true);
-                // Gọi API thực tế thông qua Service đồng bộ async/await
                 const data = await categoryProductService.getAllCategoryProducts();
 
-                // BẪY LỖI: Phòng hờ dữ liệu Axios trả về chưa bóc tách hết hoặc bị bọc trong Object
-                const listResult = Array.isArray(data) ? data : (data.data || []);
+                // 🛑 IN LOG ĐỂ KIỂM TRA TRONG F12 CONSOLE
+                console.log("Dữ liệu danh mục gốc từ Service:", data);
+
+                let listResult = [];
+
+                // BẪY LỖI ĐA TẦNG: Giải quyết triệt để lỗi bọc dữ liệu $values của C# .NET
+                if (data) {
+                    if (data.$values) {
+                        listResult = data.$values;
+                    } else if (data.data && data.data.$values) {
+                        listResult = data.data.$values;
+                    } else if (data.data && Array.isArray(data.data)) {
+                        listResult = data.data;
+                    } else if (Array.isArray(data)) {
+                        listResult = data;
+                    }
+                }
+
+                console.log("Dữ liệu danh mục sau khi bóc tách mảng thành công:", listResult);
                 setCategories(listResult);
             } catch (error) {
                 console.error("Lỗi khi kéo danh mục sản phẩm từ Backend:", error);
@@ -39,14 +49,11 @@ function CategoryMenu() {
         fetchMenuCategories();
     }, []);
 
-    // 5. Hàm xử lý khi khách hàng click chọn một danh mục thời trang cụ thể
     const handleCategoryClick = (id) => {
         setActiveCategoryId(id);
-        // Điểm mở rộng đồ án: Nơi truyền Id này xuống ProductGrid để lọc sản phẩm
         console.log(`Sinh viên Le Thi Cam Tien xử lý lọc sản phẩm cho danh mục có ID: ${id}`);
     };
 
-    // Giao diện tạm thời trong lúc hệ thống đang tải dữ liệu mạng
     if (loading) {
         return (
             <div className="container my-3 text-center">
@@ -62,13 +69,12 @@ function CategoryMenu() {
                 <div className="card shadow-sm border-0" style={{ borderRadius: '15px', overflow: 'hidden' }}>
                     <div className="card-body p-2 bg-white">
 
-                        {/* Thay đổi class sang flex-wrap và justify-content-center giúp menu tự động xuống dòng khi nhiều danh mục */}
-                        <ul className="nav nav-pills flex-wrap justify-content-center flex-column flex-sm-row">
+                        <ul className="nav nav-pills flex-wrap justify-content-center flex-sm-row">
 
                             {/* Nút mặc định: Xem tất cả sản phẩm */}
                             <li className="nav-item m-1">
                                 <button
-                                    className={`nav-link w-100 font-weight-bold border-0 text-uppercase py-3 ${activeCategoryId === null ? 'active' : 'text-secondary bg-transparent'}`}
+                                    className={`nav-link font-weight-bold border-0 text-uppercase py-2 px-4 ${activeCategoryId === null ? 'active' : 'text-secondary bg-transparent'}`}
                                     style={{
                                         borderRadius: '10px',
                                         fontSize: '14px',
@@ -82,16 +88,15 @@ function CategoryMenu() {
                                 </button>
                             </li>
 
-                            {/* VÒNG LẶP ĐỘNG: Kiểm tra mảng và duyệt mảng an toàn */}
+                            {/* VÒNG LẶP ĐỘNG: Duyệt danh sách các danh mục */}
                             {categories && categories.length > 0 && categories.map((cat) => {
-                                // Bẫy lỗi chữ Hoa/Thường từ cơ sở dữ liệu SQL Server lên API C#
                                 const catId = cat.id || cat.Id;
                                 const catName = cat.name || cat.Name;
 
                                 return (
                                     <li className="nav-item m-1" key={catId}>
                                         <button
-                                            className={`nav-link w-100 font-weight-bold border-0 text-uppercase py-3 ${activeCategoryId === catId ? 'active' : 'text-secondary bg-transparent'}`}
+                                            className={`nav-link font-weight-bold border-0 text-uppercase py-2 px-4 ${activeCategoryId === catId ? 'active' : 'text-secondary bg-transparent'}`}
                                             style={{
                                                 borderRadius: '10px',
                                                 fontSize: '14px',
@@ -101,7 +106,6 @@ function CategoryMenu() {
                                             }}
                                             onClick={() => handleCategoryClick(catId)}
                                         >
-                                            {/* Hiển thị tên danh mục thật */}
                                             {catName}
                                         </button>
                                     </li>

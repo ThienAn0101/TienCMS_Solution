@@ -1,78 +1,105 @@
-﻿import React from 'react';
+﻿/*
+ * Ten: Le Thi Cam Tien
+ * MSV: 2123110041
+ * Ngay tao: 2026-06-18
+ * Version: 1.4 (Sửa lỗi style py và tối ưu hiển thị tên 2 dòng)
+ */
 
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const IMAGE_BASE_URL = "https://localhost:7127"; // đường dẫn bên Backend
-// file thành phần component  nhận vào đối tượng 'item' từ file thành phần component  cha truyền xuống
-function ProductCard({ item }) {
+function ProductCard({ product }) {
+    const navigate = useNavigate(); // Khởi tạo điều hướng
 
-    // Hàm bổ trợ: Định dạng số thô thành chuỗi tiền tệ VNĐ (450.000 ₫)
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(value);
-    };
+    // Bẫy lỗi an toàn nếu dữ liệu product bị rỗng ngầm từ API
+    if (!product) {
+        return <div className="card h-100 p-3 text-center small text-muted">Lỗi dữ liệu sản phẩm</div>;
+    }
 
+    // Đồng bộ linh hoạt giữa chữ Hoa (PascalCase) và chữ Thường (camelCase) từ SQL Server
+    const id = product.id || product.Id;
+    const title = product.name || product.Name || "Sản phẩm thời trang";
+    const price = product.price || product.Price || 0;
+    const stock = product.stock !== undefined ? product.stock : (product.Stock !== undefined ? product.Stock : 1);
+
+    // Xử lý ảnh sản phẩm dự phòng
+    const rawImgUrl = product.imageUrl || product.ImageUrl || product.image || product.Image;
+    const IMAGE_BASE_URL = "https://localhost:7127";
+    const finalImageUrl = rawImgUrl
+        ? (rawImgUrl.startsWith('http') ? rawImgUrl : `${IMAGE_BASE_URL}${rawImgUrl}`)
+        : 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=400';
 
     return (
-        <div className="card h-100 shadow-sm border-0 product-card-hover" style={{ borderRadius: '12px', overflow: 'hidden', transition: '0.3s' }}>
+        <div className="card h-100 shadow-sm border-0 rounded-lg overflow-hidden position-relative product-card-hover" style={{ transition: '0.3s' }}>
 
-            {/* Khối 1: Hình ảnh trang phục + Nhãn tồn kho */}
-            <div className="position-relative overflow-hidden" style={{ height: '320px', backgroundColor: '#f8fafc' }}>
+            {/* 1. Phần hình ảnh sản phẩm */}
+            <div className="product-image-wrapper position-relative" style={{ height: '260px', overflow: 'hidden' }}>
                 <img
-                    src={IMAGE_BASE_URL + item.imageUrl}
-                    className="card-img-top w-100 h-100"
-                    alt={item.name}
-                    style={{ objectFit: 'cover', transition: 'transform 0.5s' }}
-                    onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
-                    onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+                    src={finalImageUrl}
+                    className="w-100 h-100"
+                    alt={title}
+                    style={{ objectFit: 'cover', transition: '0.5s' }}
                 />
-
-                {/* Thuật toán: Nếu tồn kho thấp (<= 5) thì đóng dấu cảnh báo */}
-                {item.stockQuantity <= 5 && (
-                    <span className="badge badge-danger position-absolute px-2 py-1" style={{ top: '15px', left: '15px', borderRadius: '4px', fontSize: '11px' }}>
-                        Bán chạy / Còn {item.stockQuantity} chiếc
-                    </span>
-                )}
+                {/* Nhãn bán trạng thái linh hoạt theo số lượng */}
+                <span className="badge badge-danger position-absolute" style={{ top: '10px', left: '10px', fontSize: '11px', padding: '5px 8px', backgroundColor: '#dc3545' }}>
+                    Bán chạy / {stock > 0 ? `Còn ${stock} chiếc` : 'Hết hàng'}
+                </span>
             </div>
 
-
-            {/* Khối 2: Nội dung thông tin chi tiết trang phục */}
-            <div className="card-body d-flex flex-column p-3">
-                {/* Tên sản phẩm */}
-                <h6 className="card-title font-weight-bold text-dark text-truncate mb-1" title={item.name} style={{ fontSize: '16px' }}>
-                    {item.name}
+            {/* 2. Phần nội dung chữ (Tên hiển thị tối đa 2 dòng & Giá cả) */}
+            <div className="card-body p-3 d-flex flex-column justify-content-between bg-white">
+                <h6
+                    className="card-title text-dark font-weight-normal mb-2"
+                    title={title}
+                    style={{
+                        fontSize: '14px',
+                        lineHeight: '1.4',
+                        height: '40px',
+                        overflow: 'hidden',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical'
+                    }}
+                >
+                    {title}
                 </h6>
-
-                {/* Giá tiền sản phẩm */}
-                <p className="card-text font-weight-bold text-danger mb-3" style={{ fontSize: '17px' }}>
-                    {formatCurrency(item.price)}
+                <p className="card-text text-danger font-weight-bold mb-0" style={{ fontSize: '15px' }}>
+                    {price.toLocaleString('vi-VN')} <span style={{ textDecoration: 'underline', fontSize: '13px' }}>đ</span>
                 </p>
-
-
-                {/* Cụm nút bấm tương tác đẩy sát đáy thẻ (mt-auto) */}
-                <div className="mt-auto pt-2 border-top d-flex justify-content-between">
-                    <a
-                        href={`/product/${item.id}`}
-                        className="btn btn-sm btn-outline-primary font-weight-bold px-3"
-                        style={{ borderRadius: '20px', flexGrow: 1, textAlign: 'center' }}
-                    >
-                        <i className="fas fa-eye mr-1"></i> Chi tiết
-                    </a>
-                    <button
-                        className="btn btn-sm text-white font-weight-bold px-3 ml-2"
-                        style={{ borderRadius: '20px', backgroundColor: '#11CAA0', borderColor: '#11CAA0', flexGrow: 1 }}
-                        onClick={() => alert(`Đã thêm mẫu [${item.name}] vào giỏ hàng!`)}
-                    >
-                        <i className="fas fa-cart-plus mr-1"></i> Mua ngay
-                    </button>
-                </div>
             </div>
 
+            {/* 3. Phần chân Card chứa 2 nút Chi tiết và Mua ngay đúng chuẩn mẫu */}
+            <div className="card-footer p-2 bg-white border-top-0 d-flex justify-content-between align-items-center" style={{ gap: '4px' }}>
+
+                {/* Nút Xem chi tiết - Màu xanh viền lam outline */}
+                <button
+                    className="btn btn-outline-primary btn-sm font-weight-bold d-flex align-items-center justify-content-center"
+                    style={{ width: '48%', borderRadius: '8px', fontSize: '12px', padding: '6px 0' }}
+                    onClick={() => navigate(`/product/${id}`)}
+                >
+                    <i className="far fa-eye mr-1"></i> Chi tiết
+                </button>
+
+                {/* Nút Mua ngay - Màu xanh ngọc thương hiệu */}
+                <button
+                    className="btn btn-sm font-weight-bold text-white d-flex align-items-center justify-content-center"
+                    style={{
+                        width: '48%',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                        padding: '6px 0',
+                        backgroundColor: '#11CAA0',
+                        border: 'none'
+                    }}
+                    onClick={() => console.log(`Thêm vào giỏ hàng sản phẩm ID: ${id}`)}
+                >
+                    <i className="fas fa-shopping-cart mr-1"></i> Mua ngay
+                </button>
+
+            </div>
 
         </div>
     );
 }
-
 
 export default ProductCard;

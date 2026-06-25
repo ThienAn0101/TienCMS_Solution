@@ -1,17 +1,18 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿/*
+ * Ten: Le Thi Cam Tien
+ * MSV: 2123110041
+ * Ngay tao: 2026-06-25
+ * Version: 1.2 (Sửa lỗi lệch tên Props truyền vào ProductCard)
+ */
+
+import React, { useState, useEffect } from 'react';
 import productService from '../../services/productService';
-// IMPORT file thành phần component  CON VÀO ĐỂ SỬ DỤNG
+// IMPORT file thành phần component CON VÀO ĐỂ SỬ DỤNG
 import ProductCard from '../../components/ProductCard';
-
-
-
 
 function ProductGrid() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
-
-
-
 
     useEffect(() => {
         const fetchAllProducts = async () => {
@@ -28,9 +29,6 @@ function ProductGrid() {
         fetchAllProducts();
     }, []);
 
-
-
-
     if (loading) {
         return (
             <div className="container my-5 text-center">
@@ -40,13 +38,9 @@ function ProductGrid() {
         );
     }
 
-
-
-
     return (
         <section className="product-grid-wrapper py-4">
             <div className="container">
-
 
                 <div className="section-heading mb-4 d-flex justify-content-between align-items-center border-bottom pb-2">
                     <h4 className="font-weight-bold text-uppercase m-0" style={{ color: '#005088' }}>
@@ -57,28 +51,26 @@ function ProductGrid() {
                     </span>
                 </div>
 
-
-
-
                 {/* KHUNG LƯỚI GRID SYSTEM */}
                 <div className="row">
-                    {products.map((product) => (
-                        <div className="col-xl-3 col-lg-4 col-sm-6 col-12 mb-4" key={product.id}>
-                            {/* CHÈN ĐÚNG file thành phần component  CON TẠI ĐÂY VÀ TRUYỀN DỮ LIỆU ĐI */}
-                            <ProductCard item={product} />
+                    {products.length === 0 ? (
+                        <div className="col-12 text-center py-5">
+                            <p className="text-muted">Chưa có sản phẩm nào trong hệ thống.</p>
                         </div>
-                    ))}
+                    ) : (
+                        products.map((product) => (
+                            // Sử dụng cấu trúc đồng bộ id từ cả thuộc tính chữ hoa/thường của API
+                            <div className="col-xl-3 col-lg-3 col-md-4 col-sm-6 col-6 mb-4 px-2" key={product.id || product.Id}>
+                                {/* SỬA LỖI: Đổi từ item={product} thành product={product} để khớp với component con */}
+                                <ProductCard product={product} />
+                            </div>
+                        ))
+                    )}
                 </div>
-
-
-
 
             </div>
         </section>
     );
 }
-
-
-
 
 export default ProductGrid;

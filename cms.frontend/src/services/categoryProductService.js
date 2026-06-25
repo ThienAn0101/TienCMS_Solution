@@ -2,21 +2,28 @@
  * Ten: Le Thi Cam Tien
  * MSV: 2123110041
  * Ngay tao: 2026-06-09
- * Version: 1.0
+ * Version: 1.1 (Sửa lỗi chính tả định tuyến URL & Thêm bẫy lỗi async/await)
  */
+
 import axiosClient from '../api/axiosClient';
 
 const categoryProductService = {
+    /**
+     * Hàm lấy toàn bộ danh mục SẢN PHẨM từ Backend
+     * Endpoint này kết nối tới CategoryProductController trong ASP.NET Core
+     */
     getAllCategoryProducts: async () => {
         try {
-            // SỬA Ở ĐÂY: Viết hoa chữ C và chữ P cho khớp với tên Controller bên Backend
-            const url = 'CategoryProducts';
+            // SỬA LỖI: Đổi từ '/categoriesproducts' thành '/CategoryProducts' để khớp chuẩn Backend của bạn
+            const url = '/CategoryProducts';
+
             const response = await axiosClient.get(url);
-            return response.data || response;
+            return response;
         } catch (error) {
-            console.error("Lỗi API getAllCategoryProducts:", error);
-            throw error;
+            console.error("Lỗi API getAllCategoryProducts của sinh viên Le Thi Cam Tien:", error);
+            return []; // Trả về mảng rỗng để không bị đứng giao diện
         }
     }
 };
+
 export default categoryProductService;

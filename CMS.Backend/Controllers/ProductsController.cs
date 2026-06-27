@@ -2,17 +2,17 @@
  * Ten: Le Thi Cam Tien
  * MSV: 2123110041
  * Ngay tao: 2026-06-04
- * Version: 1.0
+ * Ngay cap nhat: 2026-06-26
+ * Version: 2.0 (Tích hợp bộ lọc tìm kiếm giá Max-Min hiển thị trực tiếp lên Swagger)
  */
-
 using CMS.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace CMS.Backend.Controllers
 {
-    // 1. Định nghĩa đường dẫn để gọi API. [controller] sẽ tự lấy tên là "Categories"
-    // Khi chạy, địa chỉ truy cập dữ liệu sẽ là: https://localhost:xxxx/api/categories
+    // 1. Định nghĩa đường dẫn để gọi API. [controller] tự động nhận diện là "Products"
+    // Khi chạy, địa chỉ truy cập dữ liệu sẽ là: https://localhost:xxxx/api/products
     [Route("api/[controller]")]
 
     // 2. Đánh dấu đây là một API Controller để hệ thống hỗ trợ các tính năng tự động kiểm tra dữ liệu đầu vào
@@ -29,13 +29,28 @@ namespace CMS.Backend.Controllers
             _context = context;
         }
 
-        // 1. Chỉ định phương thức GET (Dùng để kéo dữ liệu từ cơ sở dữ liệu)
+        // 🌟 1. CẬP NHẬT PHƯƠNG THỨC GET: Hỗ trợ truyền tham số minPrice và maxPrice từ Query String
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice)
         {
-            // Lấy toàn bộ dữ liệu từ bảng Products số nhiều trong SQL Server
-            var products = await _context.Products
-                .OrderByDescending(p => p.Id) // Sắp xếp sản phẩm mới nhất lên đầu
+            // Khởi tạo câu lệnh truy vấn LINQ hướng tới bảng Products dữ liệu gốc
+            var query = _context.Products.AsQueryable();
+
+            // Lọc theo giá tối thiểu nếu Tiên nhập trên giao diện Swagger
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice.Value);
+            }
+
+            // Lọc theo giá tối đa nếu Tiên nhập trên giao diện Swagger
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice.Value);
+            }
+
+            // Thực thi truy vấn, sắp xếp sản phẩm mới nhất lên đầu và chuyển thành List dạng Async
+            var products = await query
+                .OrderByDescending(p => p.Id)
                 .ToListAsync();
 
             // Trả về kết quả cho Frontend kèm mã trạng thái HTTP 200 OK (Thành công)
@@ -49,10 +64,12 @@ namespace CMS.Backend.Controllers
             // Lọc các bài viết có CategoryId trùng với ID truyền vào từ thanh URL
             var products = await _context.Products
                 .Where(p => p.CategoryProductId == categoryProductId)
+                .OrderByDescending(p => p.Id) // Đồng bộ sắp xếp mới nhất
                 .ToListAsync();
 
             return Ok(products);
         }
+
         // 3. Định nghĩa đường dẫn nhận ID trực tiếp: api/products/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDetail(int id)
@@ -72,5 +89,4 @@ namespace CMS.Backend.Controllers
             return Ok(product);
         }
     }
-
 }

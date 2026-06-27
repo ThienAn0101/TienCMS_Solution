@@ -6,7 +6,6 @@
 
 <div class="container mt-4">
 
-    <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
@@ -18,12 +17,10 @@
         </ol>
     </nav>
 
-    <!-- Tên sản phẩm -->
     <h1 class="display-4 fw-bold text-primary">
         @Model.Name
     </h1>
 
-    <!-- Thông tin -->
     <div class="mb-3">
         @if (Model.CategoryProduct != null)
         {
@@ -32,12 +29,10 @@
                 @Model.CategoryProduct.Name
             </p>
         }
-
     </div>
 
     <hr />
 
-    <!-- Hình ảnh -->
     @if (!string.IsNullOrEmpty(Model.ImageUrl))
     {
         <div class="text-center mb-4">
@@ -48,21 +43,17 @@
         </div>
     }
 
-    <!-- Mô tả -->
     <div class="mt-4">
         <h4>Mô tả sản phẩm</h4>
-
-        <p style="font-size:18px; line-height:1.8;">
-            @Model.Description
-        </p>
+        <div style="font-size:18px; line-height:1.8;">
+            @Html.Raw(Model.Description)
+        </div>
     </div>
 
     <hr />
 
-    <!-- Nút quay lại -->
     <a asp-action="Index"
        class="btn btn-secondary">
         ← Quay lại danh sách
     </a>
-
 </div>

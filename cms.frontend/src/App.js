@@ -14,6 +14,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/home/index';
+import HomeSlider from './components/HomeSlider';
 import BlogListPage from './pages/blog/index';
 import BlogDetail from './pages/blog/BlogDetail';
 import Blog from './pages/blog-detail/index';
@@ -24,7 +25,8 @@ import Shop from './pages/shop/index';
 import Register from './pages/register/index';
 import Login from './pages/login/index';
 import About from './pages/about/index'; 
-
+import MyOrders from './pages/my-orders';
+import Profile from './pages/profile';
 import './App.css';
 
 function App() {
@@ -38,6 +40,12 @@ function App() {
                     <Routes>
                         {/* Cấu hình Trang chủ - Khớp hoàn toàn với địa chỉ "/home" */}
                         <Route path="/" element={<Home />} />
+
+                        <Route path="/my-orders" element={<MyOrders />} />
+
+                        <Route path="/profile" element={<Profile />} />
+
+                        <Route path="/homeslider" element={<HomeSlider />} />
 
                         {/* 1. Đường dẫn đến trang danh sách toàn bộ tin tức */}
                         <Route path="/blog" element={<BlogListPage />} />

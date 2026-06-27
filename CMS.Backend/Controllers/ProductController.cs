@@ -179,5 +179,56 @@ namespace CMS.Backend.Controllers
             // Cập nhật thành công, điều hướng quay lại trang Danh sách sản phẩm (Index)
             return RedirectToAction("Index");
         }
+
+        //----------------------------------- API CHO FRONTEND REACTJS --------------------------------
+        // URL gọi qua Axios: https://localhost:7127/Product/GetShopProducts?page=1&pageSize=6
+        [HttpGet]
+        public async Task<IActionResult> GetShopProducts(int page = 1, int pageSize = 6)
+        {
+            if (page < 1) page = 1;
+
+            // 1. Tính tổng số sản phẩm đang có trong Database
+            var totalProducts = await _context.Products.CountAsync();
+
+            // 2. Tính tổng số trang (Ví dụ: 13 sản phẩm / 6 = 3 trang)
+            var totalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
+
+            // 3. Sử dụng Skip và Take để lấy đúng 6 sản phẩm của trang được yêu cầu
+            var products = await _context.Products
+                .OrderByDescending(p => p.Id) // Sản phẩm mới tạo đưa lên đầu
+                .Skip((page - 1) * pageSize)  // Bỏ qua sản phẩm các trang trước
+                .Take(pageSize)               // Lấy chuẩn số lượng (6 items)
+                .ToListAsync();
+
+            // Mẹo: Vì API chạy cổng 7127, còn React chạy cổng 3000 hoặc 3001, 
+            // Nếu database lưu link ảnh dạng "/uploads/products/abc.jpg", 
+            // tụi mình sẽ nối thêm domain để ReactJS bên ngoài hiển thị được hình ảnh ngay lập tức nhé Tiên.
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            var result = products.Select(p => new
+            {
+                p.Id,
+                p.Name,
+                p.Price,
+                p.Description,
+                p.CategoryProductId,
+                // Nếu ImageUrl không bắt đầu bằng http thì nối domain Backend vào
+                ImageUrl = !string.IsNullOrEmpty(p.ImageUrl) && !p.ImageUrl.StartsWith("http")
+                           ? baseUrl + p.ImageUrl
+                           : p.ImageUrl
+            });
+
+            // 4. Trả về định dạng JSON bọc đầy đủ sản phẩm và thông số trang
+            return Json(new
+            {
+                products = result,
+                currentPage = page,
+                totalPages = totalPages,
+                pageSize = pageSize,
+                totalItems = totalProducts
+            }, new Microsoft.AspNetCore.Mvc.JsonOptions
+            {
+                JsonSerializerOptions = { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }
+            });
+        }
     }
 }

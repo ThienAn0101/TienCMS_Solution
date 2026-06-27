@@ -1,13 +1,11 @@
 ﻿/*
  * Ten: Le Thi Cam Tien
  * MSV: 2123110041
- * Ngay tao: 2026-06-25
- * Version: 1.2 (Sửa lỗi lệch tên Props truyền vào ProductCard)
+ * Ngay cap nhat: 2026-06-27
+ * Version: 2.2 (Lọc linh động tự động lấy 4 sản phẩm mới nhất và giá trị nhất cho trang chủ)
  */
-
 import React, { useState, useEffect } from 'react';
 import productService from '../../services/productService';
-// IMPORT file thành phần component CON VÀO ĐỂ SỬ DỤNG
 import ProductCard from '../../components/ProductCard';
 
 function ProductGrid() {
@@ -19,9 +17,29 @@ function ProductGrid() {
             try {
                 setLoading(true);
                 const data = await productService.getAllProducts();
-                setProducts(data);
+                const allProducts = Array.isArray(data) ? data : [];
+
+                // 🌟 THUẬT TOÁN LỌC LINH ĐỘNG TỰ ĐỘNG:
+                // Sắp xếp sản phẩm theo ID giảm dần (để lấy đồ mới lên trước)
+                // Nếu ID bằng nhau hoặc ngẫu nhiên, sẽ ưu tiên sản phẩm có Giá (Price) cao nhất lên đầu.
+                const dynamicSorted = allProducts.sort((a, b) => {
+                    const idA = a.id || a.Id || 0;
+                    const idB = b.id || b.Id || 0;
+
+                    const priceA = a.price || a.Price || 0;
+                    const priceB = b.price || b.Price || 0;
+
+                    // Công thức tính điểm ưu tiên linh động: Đồ mới + Đồ giá trị
+                    return (idB + priceB) - (idA + priceA);
+                });
+
+                // 🌟 Tự động cắt lấy 4 sản phẩm đứng đầu sau khi sắp xếp linh động
+                const top4Products = dynamicSorted.slice(0, 4);
+
+                setProducts(top4Products);
             } catch (error) {
                 console.error("Lỗi hệ thống khi tải danh sách sản phẩm:", error);
+                setProducts([]);
             } finally {
                 setLoading(false);
             }
@@ -59,9 +77,7 @@ function ProductGrid() {
                         </div>
                     ) : (
                         products.map((product) => (
-                            // Sử dụng cấu trúc đồng bộ id từ cả thuộc tính chữ hoa/thường của API
                             <div className="col-xl-3 col-lg-3 col-md-4 col-sm-6 col-6 mb-4 px-2" key={product.id || product.Id}>
-                                {/* SỬA LỖI: Đổi từ item={product} thành product={product} để khớp với component con */}
                                 <ProductCard product={product} />
                             </div>
                         ))

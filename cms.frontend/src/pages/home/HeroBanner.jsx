@@ -1,20 +1,20 @@
-﻿import React from 'react';
+﻿/*
+ * Ten: Le Thi Cam Tien
+ * MSV: 2123110041
+ * Ngay tao: 2026-06-25
+ * Version: 1.1 (Đã thay thế ô thực hành bằng Slider chuyển ảnh tự động)
+ */
+import React from 'react';
+import HomeSlider from '../../components/HomeSlider';
+
 function HeroBanner() {
     return (
-        <section
-            className="hero-banner-clean bg-light my-4 d-flex align-items-center justify-content-center"
-            style={{
-                minHeight: '200px',
-                border: '2px dashed #11CAA0',
-                borderRadius: '8px'
-            }}
-        >
-            <div className="text-center p-3">
-                <h4 className="font-weight-bold text-secondary mb-0">
-                    Dành tự thực hành
-                </h4>
-            </div>
+        // 🌟 2. Thay đổi cấu trúc bao ngoài: Bỏ viền nét đứt và căn giữa để nhường chỗ cho Slider phủ hết diện tích
+        <section className="hero-banner-main my-4">
+            {/* Gọi trực tiếp component HomeSlider để chạy chuỗi ảnh thời trang động */}
+            <HomeSlider />
         </section>
     );
 }
+
 export default HeroBanner;

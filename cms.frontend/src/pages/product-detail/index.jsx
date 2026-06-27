@@ -2,7 +2,8 @@
  * Ten: Le Thi Cam Tien
  * MSV: 2123110041
  * Ngay tao: 2026-06-18
- * Version: 1.0 (Xử lý chi tiết sản phẩm & Chặn bán vượt kho)
+ * Ngay cap nhat: 2026-06-27
+ * Version: 2.0 (Tích hợp luồng ghi đè LocalStorage và kích hoạt Custom Event cập nhật giỏ hàng Realtime)
  */
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -33,10 +34,11 @@ function ProductDetail() {
         fetchProductDetail();
     }, [id]);
 
-    // 3. LOGIC CỐT LÕI: Hàm xử lý thêm vào giỏ hàng và kiểm tra StockQuantity
+    // 3. LOGIC CỐT LÕI: Hàm xử lý thêm vào giỏ hàng và đồng bộ dữ liệu Realtime
     const handleAddToCart = () => {
+
         // Đồng bộ thuộc tính số lượng kho từ Backend (chữ Hoa hoặc chữ Thường)
-        const stockAvailable = product.stockQuantity ?? product.StockQuantity ?? 0;
+        const stockAvailable = product.stockQuantity ?? product.StockQuantity ?? product.stock ?? product.Stock ?? 0;
 
         // KIỂM TRA CHẶN LỖI BÁN VƯỢT KHO Theo yêu cầu đồ án
         if (quantity > stockAvailable) {
@@ -44,8 +46,44 @@ function ProductDetail() {
             return; // Kích hoạt lệnh chặn lại, không cho chạy tiếp xuống dưới
         }
 
-        // Nếu hợp lệ, xử lý đưa vào giỏ hàng (Localstorage hoặc Redux...)
-        alert(`🎉 Chúc mừng Le Thi Cam Tien thêm thành công ${quantity} sản phẩm vào giỏ hàng!`);
+        try {
+            // 🌟 LUỒNG XỬ LÝ GIỎ HÀNG THỰC TẾ TRÊN LOCALSTORAGE
+            // a. Đọc giỏ hàng cũ từ LocalStorage ra (nếu chưa có thì khởi tạo mảng rỗng)
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+            // b. Chuẩn hóa ID đồng bộ linh hoạt
+            const productId = product.id || product.Id;
+
+            // c. Kiểm tra sản phẩm này đã từng tồn tại trong giỏ chưa
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                // Nếu đã có, cộng dồn số lượng khách chọn thêm vào số lượng cũ
+                existingItem.quantity += quantity;
+            } else {
+                // Nếu chưa có, tạo cấu trúc item chuẩn khớp hoàn toàn với trang Cart
+                const rawImgUrl = product.imageUrl || product.ImageUrl || product.image || product.Image;
+
+                cart.push({
+                    id: productId,
+                    name: product.name || product.Name || "Sản phẩm thời trang",
+                    price: product.price !== undefined ? product.price : (product.Price || 0),
+                    image: rawImgUrl || 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=400',
+                    quantity: quantity
+                });
+            }
+
+            // d. Ghi đè mảng dữ liệu mới nhất trở lại LocalStorage dưới dạng chuỗi JSON
+            localStorage.setItem('cart', JSON.stringify(cart));
+
+            // e. 🌟 PHÁT TÍN HIỆU ĐỒNG BỘ REALTIME: Báo cho icon Header biết để nhảy số lập tức
+            window.dispatchEvent(new Event('cartUpdated'));
+
+            alert(`🎉 Thêm thành công ${quantity} sản phẩm vào giỏ hàng!`);
+        } catch (error) {
+            console.error("Lỗi khi ghi dữ liệu giỏ hàng vào LocalStorage:", error);
+            alert("❌ Có lỗi xảy ra khi thêm vào giỏ hàng!");
+        }
     };
 
     // Tăng giảm số lượng bấm nút ô Input
@@ -76,7 +114,7 @@ function ProductDetail() {
     const title = product.name || product.Name || "Sản phẩm không có tên";
     const price = product.price || product.Price || 0;
     const description = product.description || product.Description || "Mô tả sản phẩm đang được cập nhật.";
-    const stock = product.stockQuantity ?? product.StockQuantity ?? 0;
+    const stock = product.stockQuantity ?? product.StockQuantity ?? product.stock ?? product.Stock ?? 0;
 
     // Xử lý ảnh đại diện lớn cố định
     const rawImgUrl = product.imageUrl || product.ImageUrl || product.image || product.Image;
@@ -93,7 +131,7 @@ function ProductDetail() {
 
             <div className="row bg-white p-4 rounded shadow-sm border">
 
-                {/* CỘT TRÁI: 1 Ảnh đại diện lớn cố định (Không làm slide ảnh) */}
+                {/* CỘT TRÁI: 1 Ảnh đại diện lớn cố định */}
                 <div className="col-md-6 mb-4 mb-md-0">
                     <div className="product-detail-image border rounded overflow-hidden" style={{ height: '480px' }}>
                         <img
@@ -129,7 +167,11 @@ function ProductDetail() {
                         {/* Mô tả sản phẩm */}
                         <div className="product-desc mb-4">
                             <h6 className="font-weight-bold text-dark mb-2">Mô tả sản phẩm:</h6>
-                            <p className="text-muted" style={{ lineHeight: '1.6', fontSize: '14px' }}>{description}</p>
+                            <div
+                                className="text-muted"
+                                style={{ lineHeight: '1.6', fontSize: '14px' }}
+                                dangerouslySetInnerHTML={{ __html: description }}
+                            />
                         </div>
                     </div>
 
@@ -159,11 +201,12 @@ function ProductDetail() {
                         <button
                             className="btn btn-block text-white font-weight-bold py-3 text-uppercase"
                             style={{
-                                backgroundColor: '#11CAA0', // Màu thương hiệu đồng bộ menu của Tiên
+                                backgroundColor: '#11CAA0',
                                 borderRadius: '10px',
                                 fontSize: '15px',
                                 border: 'none',
-                                transition: '0.3s'
+                                transition: '0.3s',
+                                cursor: stock === 0 ? 'not-allowed' : 'pointer'
                             }}
                             disabled={stock === 0} // Vô hiệu hóa nút nếu kho bằng 0
                             onClick={handleAddToCart}

@@ -1,8 +1,8 @@
 ﻿/*
  * Ten: Le Thi Cam Tien
  * MSV: 2123110041
- * Ngay tao: 2026-06-18
- * Version: 1.3 (Sửa triệt để lỗi thiếu dấu phẩy giữa các hàm)
+ * Ngay tao: 2026-06-26
+ * Version: 2.1 (Tối ưu hóa việc truyền tham số đăng nhập và bóc tách dữ liệu sạch)
  */
 import axiosClient from '../api/axiosClient';
 
@@ -18,20 +18,29 @@ const authService = {
             console.error("Lỗi API registerCustomer:", error);
             throw error;
         }
-    }, // <-- DẤU PHẨY THẦN THÁNH Ở ĐÂY NHA TIÊN, Nãy bị thiếu dấu này nè!
+    },
 
-    // *
-    //  * API Endpoint: POST https:localhost:7127/api/Customers/login
-    
-    // loginCustomer: async (loginData) => {
-    //     try {
-    //         const response = await axiosClient.post('/Customers/login', loginData);
-    //         return response;
-    //     } catch (error) {
-    //         console.error("Lỗi API loginCustomer:", error);
-    //         throw error;
-    //     }
-    // }
+    /**
+     * Hàm gửi yêu cầu Đăng nhập xuống Backend
+     */
+    login: async (loginData) => {
+        try {
+            // Gửi trực tiếp loginData (chứa email và password viết thường) xuống Backend
+            // Phía C# dynamic sẽ tự bóc tách được bất kể hoa thường
+            const response = await axiosClient.post('/Customers/Login', loginData);
+
+            // Lưu dữ liệu user sạch vào localStorage nếu có
+            if (response.data && response.data.user) {
+                localStorage.setItem('user', JSON.stringify(response.data.user));
+            }
+
+            // Trả về toàn bộ response gốc để file Login.jsx dễ xử lý mã trạng thái
+            return response;
+        } catch (error) {
+            console.error("Lỗi API login:", error);
+            throw error;
+        }
+    }
 };
 
 export default authService;

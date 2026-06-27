@@ -1,19 +1,18 @@
-﻿import React, { useState } from 'react';
+﻿/*
+ * Ten: Le Thi Cam Tien
+ * MSV: 2123110041
+ * Ngay tao: 2026-06-26
+ * Version: 4.1 (Bổ sung thuộc tính value cho input và đồng bộ bóc tách dữ liệu sạch từ authService)
+ */
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';
-
-
-
 
 function Login() {
     const navigate = useNavigate();
 
-
     // State lưu trữ cặp tài nguyên đăng nhập từ người dùng
     const [credentials, setCredentials] = useState({ email: '', password: '' });
-
-
-
 
     const handleChange = (e) => {
         setCredentials({
@@ -22,45 +21,42 @@ function Login() {
         });
     };
 
-
-
-
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
         try {
-            // 1. Gửi Email và Mật khẩu xuống API Backend để thực hiện xác thực ngầm
+            // 1. Gọi API xác thực từ authService
             const response = await authService.login(credentials);
+
+            // 🌟 ĐỒNG BỘ: Đọc an toàn từ cả response.data (nếu trả về response gốc)
+            // hoặc chính response (nếu authService đã bóc .data từ trước)
             const data = response.data || response;
 
+            if (data && data.user) {
+                // 2. Lưu thông tin đăng nhập thành viên vào bộ nhớ trình duyệt
+                localStorage.setItem('customer', JSON.stringify(data.user));
+                localStorage.setItem('user', JSON.stringify(data.user));
 
+                alert(`🎉 XÁC THỰC THÀNH CÔNG: Chào mừng ${data.user.fullName || data.user.FullName} đã đăng nhập hệ thống!`);
 
+                // 3. Điều hướng quay lại trang chủ
+                navigate('/');
 
-            // 2. LOGIC XỬ LÝ CỐT LÕI: 
-            // Nếu Backend báo thành công và trả về thông tin dữ liệu sạch,
-            // sinh viên phải lưu ngay thông tin Customer vào bộ nhớ trình duyệt dưới dạng String.
-            localStorage.setItem('customer', JSON.stringify(data));
-
-
-
-
-            alert(`🎉 XÁC THỰC THÀNH CÔNG: Chào mừng ${data.fullName} đã đăng nhập hệ thống!`);
-
-
-
-
-            // 3. Sử dụng lệnh điều hướng đưa người dùng quay lại trang chủ dưới trạng thái đã đăng nhập
-            navigate('/');
-
-
-            // Ép trình duyệt nạp lại để component Header bóc tách LocalStorage hiển thị UI mới lập tức
-            window.location.reload();
+                // Ép trình duyệt nạp lại để cập nhật giao diện Header ngay lập tức
+                window.location.reload();
+            } else {
+                alert("⛔ ĐĂNG NHẬP THẤT BẠI: Cấu trúc phản hồi từ Server không khớp!");
+            }
         } catch (error) {
-            alert("⛔ ĐĂNG NHẬP THẤT BẠI: Sai tài khoản Email hoặc Mật khẩu không chính xác!");
+            console.error("Chi tiết lỗi đăng nhập từ Server:", error);
+
+            // Hiện câu chữ lỗi thật từ thông báo BadRequest của C# trả lên
+            if (error.response && error.response.data && error.response.data.message) {
+                alert("⛔ ĐĂNG NHẬP THẤT BẠI: " + error.response.data.message);
+            } else {
+                alert("⛔ ĐĂNG NHẬP THẤT BẠI: Sai tài khoản Email hoặc Mật khẩu không chính xác!");
+            }
         }
     };
-
-
-
 
     return (
         <div className="container py-5">
@@ -78,11 +74,27 @@ function Login() {
                         <form onSubmit={handleLoginSubmit}>
                             <div className="form-group mb-3">
                                 <label className="small font-weight-bold text-secondary">TÀI KHOẢN EMAIL</label>
-                                <input type="email" name="email" className="form-control" placeholder="example@gmail.com" onChange={handleChange} required />
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={credentials.email} // 🌟 Bổ sung value đồng bộ State
+                                    className="form-control"
+                                    placeholder="example@gmail.com"
+                                    onChange={handleChange}
+                                    required
+                                />
                             </div>
                             <div className="form-group mb-4">
                                 <label className="small font-weight-bold text-secondary">MẬT KHẨU</label>
-                                <input type="password" name="password" className="form-control" placeholder="******" onChange={handleChange} required />
+                                <input
+                                    type="password"
+                                    name="password"
+                                    value={credentials.password} // 🌟 Bổ sung value đồng bộ State
+                                    className="form-control"
+                                    placeholder="******"
+                                    onChange={handleChange}
+                                    required
+                                />
                             </div>
                             <button type="submit" className="btn btn-primary btn-block w-100 py-2 font-weight-bold" style={{ backgroundColor: '#005088', borderColor: '#005088', borderRadius: '8px' }}>
                                 ĐĂNG NHẬP
@@ -95,9 +107,4 @@ function Login() {
     );
 }
 
-
-
-
 export default Login;
-
-

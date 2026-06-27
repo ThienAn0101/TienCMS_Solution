@@ -4,39 +4,51 @@
 @{
     ViewData["Title"] = "Index";
 }
-
-<h1>Index</h1>
 @model IEnumerable<CMS.Data.Entities.Post>
+
+@using System.Text.RegularExpressions;
 
 <div class="container mt-4">
     <h2 class="mb-4 text-danger">DANH SÁCH BÀI VIẾT MỚI NHẤT</h2>
     <a asp-action="Create" class="btn btn-success">
         <i class="bi bi-plus-circle"></i> Thêm bài viết mới
     </a>
-    <div class="row">
+    <div class="row mt-3">
         @foreach (var item in Model)
         {
+            // Mẹo C#: Tự động lọc sạch toàn bộ các thẻ HTML trong nội dung bài viết
+            string plainContent = "";
+            if (!string.IsNullOrEmpty(item.Content))
+            {
+                plainContent = Regex.Replace(item.Content, "<.*?>", string.Empty);
+            }
+
             <div class="col-md-4 mb-3">
-                <div class="card shadow-sm">
-                    <img src="@item.ImageUrl" class="card-img-top" alt="Thumbnail">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary">@item.Title</h5>
-                        <p class="card-text text-truncate">@item.Content</p>
-                        <p class="text-muted small">Ngày đăng: @item.CreatedDate.ToString("dd/MM/yyyy")</p>
-                        <a href="/Post/Details/@item.Id" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">
-                            <i class="bi bi-pencil-square"></i> Sửa
-                        </a>
-                        <a asp-action="Delete" asp-route-id="@item.Id"
-                           class="btn btn-sm btn-outline-danger"
-                           onclick="return confirm('Chúng ta có chắc chắn muốn xóa bài viết này không?')">
-                            <i class="bi bi-trash"></i> Xóa
-                        </a>
+                <div class="card shadow-sm h-100">
+                    <img src="@item.ImageUrl" class="card-img-top" alt="Thumbnail" style="height: 200px; object-fit: cover;">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-primary fw-bold">@item.Title</h5>
+
+                        <p class="card-text text-truncate text-muted small mb-3" title="@plainContent">
+                            @plainContent
+                        </p>
+
+                        <p class="text-muted small mt-auto mb-3">Ngày đăng: @item.CreatedDate.ToString("dd/MM/yyyy")</p>
+
+                        <div class="d-flex justify-content-between gap-2 border-top pt-2">
+                            <a href="/Post/Details/@item.Id" class="btn btn-outline-primary btn-sm flex-grow-1">Xem chi tiết</a>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning px-3">
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id"
+                               class="btn btn-sm btn-outline-danger px-3"
+                               onclick="return confirm('Chúng ta có chắc chắn muốn xóa bài viết này không?')">
+                                <i class="bi bi-trash"></i> Xóa
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         }
     </div>
 </div>
-
-

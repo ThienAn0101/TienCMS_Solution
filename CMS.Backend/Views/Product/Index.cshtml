@@ -3,6 +3,8 @@
 }
 @model IEnumerable<CMS.Data.Entities.Product>
 
+@using System.Text.RegularExpressions;
+
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-primary fw-bold text-uppercase mb-0">
@@ -17,6 +19,13 @@
         {
             foreach (var item in Model)
             {
+                // Mẹo C#: Tự động xóa bỏ hoàn toàn các thẻ <p>, </p>, <strong>... để lấy chữ thuần túy
+                string plainDescription = "";
+                if (!string.IsNullOrEmpty(item.Description))
+                {
+                    plainDescription = Regex.Replace(item.Description, "<.*?>", string.Empty);
+                }
+
                 <div class="col-md-4 mb-4">
                     <div class="card shadow-sm h-100">
                         <img src="@item.ImageUrl" class="card-img-top" alt="Product Image" style="height: 200px; object-fit: cover;">
@@ -29,7 +38,9 @@
 
                             <h5 class="card-title text-dark fw-bold mb-1">@item.Name</h5>
 
-                            <p class="card-text text-truncate text-muted small mb-2">@item.Description</p>
+                            <p class="card-text text-truncate text-muted small mb-2" title="@plainDescription">
+                                @plainDescription
+                            </p>
 
                             <p class="text-danger fw-bold mt-auto mb-3">Giá: @item.Price.ToString("N0") VNĐ</p>
 

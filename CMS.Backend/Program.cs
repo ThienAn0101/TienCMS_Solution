@@ -11,16 +11,12 @@ using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🌟 1. CẤU HÌNH CORS CHUẨN (CHỈ KHAI BÁO DUY NHẤT 1 LẦN NÀY)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp", policy =>
-    {
-        policy.WithOrigins("http://localhost:7127") // Cho phép ReactJS ở port 7127 gọi tới
-              .AllowAnyHeader()                     // Cho phép mọi loại Header (Content-Type, Authorization...)
-              .AllowAnyMethod()                     // Cho phép mọi phương thức HTTP (GET, POST, PUT, DELETE)
-              .AllowCredentials();                  // Hỗ trợ truyền Cookie/Session nếu cần sau này
-    });
+    options.AddPolicy("AllowReactApp",
+        policy => policy.WithOrigins("http://localhost:3000", "http://localhost:3001") 
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
 });
 
 // Add services to the container.
